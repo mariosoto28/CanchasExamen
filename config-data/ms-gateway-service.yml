@@ -1,0 +1,55 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: ms-gateway-server
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      routes:
+        - id: ms-cancha
+          uri: lb://ms-cancha
+          predicates:
+            - Path=/canchas/**
+          filters:
+            - name: AuthFilter
+
+        - id: ms-reserva-cancha
+          uri: lb://ms-reserva-cancha
+          predicates:
+            - Path=/reservas/**
+          filters:
+            - name: AuthFilter
+
+        - id: ms-ubicacion
+          uri: lb://ms-ubicacion
+          predicates:
+            - Path=/ubicaciones/**
+          filters:
+            - name: AuthFilter
+
+        - id: ms-usuario
+          uri: lb://ms-usuario
+          predicates:
+            - Path=/usuarios/**
+          filters:
+            - name: AuthFilter
+
+        - id: ms-auth-service
+          uri: lb://ms-auth-service
+          predicates:
+            - Path=/auth/**
+          filters: []
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8000/eureka}
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
